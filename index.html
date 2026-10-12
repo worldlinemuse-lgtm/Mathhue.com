@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free World Creator &amp; Researcher</title>
+<meta name="description" content="Herbal research, alternative solutions, poetry, and the upcoming book.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="topnav" aria-label="Main navigation">
+  <a class="brand" href="#home" data-config="siteName">YOUR NAME HERE</a>
+  <div class="nav-links">
+    <a href="#home">Home</a>
+    <a href="#herbal">Herbal Research</a>
+    <a href="#book">Book</a>
+    <a href="#sovereignty">Alternative Tech</a>
+    <a href="#poetry">Poetry</a>
+    <a href="#community">Community</a>
+  </div>
+</nav>
+
+<header class="hero" id="home">
+  <div class="hero-inner">
+    <div class="portrait-wrap">
+      <img id="portrait" src="assets/portrait.jpg" alt="Portrait"
+           onerror="this.onerror=null;this.src=portraitPlaceholderSVG();">
+    </div>
+    <p class="tagline" data-config="tagline">Free World Creator &amp; Researcher</p>
+    <h1 data-config="siteName">YOUR NAME HERE</h1>
+    <a id="discord-btn" class="btn btn-discord" href="#discord-invite-placeholder">
+      Join the Discord: Creating a Free World
+    </a>
+    <div id="social-dock" class="social-dock" aria-label="Social media links"></div>
+  </div>
+</header>
+
+<main>
+  <section class="tiles-section" aria-label="Topic hubs">
+    <div id="tiles" class="tiles-grid"></div>
+  </section>
+
+  <section id="community" class="community">
+    <h2>Community</h2>
+    <p>Join the conversation, share research, and connect with others building a free world.</p>
+    <a id="discord-btn-2" class="btn btn-discord" href="#discord-invite-placeholder">
+      Join the Discord: Creating a Free World
+    </a>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; <span id="year"></span> <span data-config="siteName">YOUR NAME HERE</span>.
+     Content is for research and education.</p>
+</footer>
+
+<script src="icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
