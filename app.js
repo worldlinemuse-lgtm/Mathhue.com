@@ -9,7 +9,7 @@
     return;
   }
 
-  const name = cfg.siteName || 'Mathhue';
+  const name = cfg.siteName || 'MathHue';
   document.title = `${name} | ${cfg.tagline || ''}`;
 
   document.querySelectorAll('[data-config]').forEach(el => {

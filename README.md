@@ -1,4 +1,4 @@
-# Mathhue.com
+# MathHue.com
 
 A design homage to the classic 2007-era Facebook profile — built for the
 "Free World Creator & Researcher" spec. Not affiliated with Facebook.
@@ -15,7 +15,7 @@ A design homage to the classic 2007-era Facebook profile — built for the
 - Anatomy: blue header bar with lowercase wordmark + tabs; centered ~800px
   page on gray; left column (photo ~200px, Poke / Send Message actions,
   tinted Information box, Websites, Community grid, Photos strip); main
-  column (name, third-person status — "Mathhue is …", Mini-Feed, Boxes,
+  column (name, third-person status — "MathHue is …", Mini-Feed, Boxes,
   The Wall with composer).
 
 ## Filling in the real assets later
@@ -39,6 +39,6 @@ and render faded so it's obvious what still needs a real URL.
 ## Interactive bits (client-side only)
 
 - **The Wall**: visitors can post; stored in the browser's localStorage.
-- **Poke**: "Poke Mathhue" increments a localStorage counter, classic style.
+- **Poke**: "Poke MathHue" increments a localStorage counter, classic style.
 
 No build step, no backend. Deploys anywhere static (GitHub Pages, etc.).
