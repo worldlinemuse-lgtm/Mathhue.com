@@ -3,56 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free World Creator &amp; Researcher</title>
+<title>Mathhue | Free World Creator &amp; Researcher</title>
 <meta name="description" content="Herbal research, alternative solutions, poetry, and the upcoming book.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<nav class="topnav" aria-label="Main navigation">
-  <a class="brand" href="#home" data-config="siteName">YOUR NAME HERE</a>
-  <div class="nav-links">
-    <a href="#home">Home</a>
-    <a href="#herbal">Herbal Research</a>
-    <a href="#book">Book</a>
-    <a href="#sovereignty">Alternative Tech</a>
-    <a href="#poetry">Poetry</a>
-    <a href="#community">Community</a>
+<div class="fb-header">
+  <div class="fb-header-inner">
+    <a class="wordmark" href="#profile">mathhue</a>
+    <nav class="fb-tabs" aria-label="Profile sections">
+      <a href="#profile">Profile</a>
+      <a href="#box-herbal">Herbal Research</a>
+      <a href="#box-book">Book</a>
+      <a href="#box-sovereignty">Alternative Tech</a>
+      <a href="#box-poetry">Poetry</a>
+      <a href="#community">Community</a>
+    </nav>
+    <a class="fb-donate" href="#donate">Donate</a>
   </div>
-</nav>
+</div>
 
-<header class="hero" id="home">
-  <div class="hero-inner">
-    <div class="portrait-wrap">
-      <img id="portrait" src="assets/portrait.jpg" alt="Portrait"
-           onerror="this.onerror=null;this.src=portraitPlaceholderSVG();">
-    </div>
-    <p class="tagline" data-config="tagline">Free World Creator &amp; Researcher</p>
-    <h1 data-config="siteName">YOUR NAME HERE</h1>
-    <a id="discord-btn" class="btn btn-discord" href="#discord-invite-placeholder">
-      Join the Discord: Creating a Free World
-    </a>
-    <div id="social-dock" class="social-dock" aria-label="Social media links"></div>
+<div class="page" id="profile">
+  <div class="cols">
+
+    <aside class="left-col">
+      <div class="photo-wrap">
+        <img id="portrait" src="assets/portrait.jpg" alt="Profile photo"
+             onerror="this.onerror=null;this.src=portraitPlaceholderSVG();">
+      </div>
+
+      <div class="actions">
+        <a href="#" id="poke-link">Poke Mathhue</a>
+        <a href="#wall">Send Mathhue a Message</a>
+        <a id="discord-btn" class="btn-primary btn-block" href="#discord-invite-placeholder">Join the Discord</a>
+        <p id="poke-note" class="poke-note" hidden></p>
+      </div>
+
+      <section class="side-box tinted">
+        <h3>Information</h3>
+        <dl id="info-rows" class="info-rows"></dl>
+      </section>
+
+      <section class="side-box">
+        <h3>Websites</h3>
+        <div id="social-dock" class="websites"></div>
+      </section>
+
+      <section class="side-box" id="community">
+        <h3>Community <span class="see-all"><a id="discord-link-2" href="#discord-invite-placeholder">Join &raquo;</a></span></h3>
+        <div class="thumb-grid" id="community-grid"></div>
+      </section>
+
+      <section class="side-box">
+        <h3>Photos</h3>
+        <div class="thumb-grid" id="photos-strip"></div>
+      </section>
+    </aside>
+
+    <main class="main-col">
+      <h1 class="profile-name" data-config="siteName">Mathhue</h1>
+      <div class="network-line" data-config="tagline">Free World Creator &amp; Researcher</div>
+      <p class="status"><strong>Mathhue</strong> is <span id="status-text"></span></p>
+
+      <section class="content-box">
+        <h2>Mini-Feed</h2>
+        <ul id="mini-feed" class="feed"></ul>
+      </section>
+
+      <section class="content-box">
+        <h2>Boxes</h2>
+        <div id="boxes" class="boxes-grid"></div>
+      </section>
+
+      <section class="content-box" id="wall">
+        <h2>The Wall</h2>
+        <div class="composer">
+          <textarea id="wall-input" rows="2" placeholder="Write on Mathhue's wall..."></textarea>
+          <button id="wall-post" class="btn-primary">Post</button>
+        </div>
+        <ul id="wall-posts" class="wall"></ul>
+        <p id="wall-empty" class="empty-note">No wall posts yet. Be the first to sign the wall.</p>
+      </section>
+
+      <section class="content-box" id="donate">
+        <h2>Support</h2>
+        <p>Direct contributions fund the research and keep the content coming.</p>
+        <a id="paypal-btn" class="btn-primary" href="#paypal-placeholder">Donate via PayPal</a>
+      </section>
+    </main>
+
   </div>
-</header>
+</div>
 
-<main>
-  <section class="tiles-section" aria-label="Topic hubs">
-    <div id="tiles" class="tiles-grid"></div>
-  </section>
-
-  <section id="community" class="community">
-    <h2>Community</h2>
-    <p>Join the conversation, share research, and connect with others building a free world.</p>
-    <a id="discord-btn-2" class="btn btn-discord" href="#discord-invite-placeholder">
-      Join the Discord: Creating a Free World
-    </a>
-  </section>
-</main>
-
-<footer>
-  <p>&copy; <span id="year"></span> <span data-config="siteName">YOUR NAME HERE</span>.
-     Content is for research and education.</p>
+<footer class="fb-footer">
+  <p><span data-config="siteName">Mathhue</span> &copy; <span id="year"></span>
+    &middot; About &middot; Herbal Research &middot; Book &middot; Help</p>
+  <p class="homage">A design homage to the classic 2007 profile era. Not affiliated with Facebook.</p>
 </footer>
 
 <script src="icons.js"></script>
