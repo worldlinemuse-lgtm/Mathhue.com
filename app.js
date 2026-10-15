@@ -139,7 +139,7 @@
       li.innerHTML = `
         <img class="wall-thumb" src="${portraitPlaceholderSVG()}" alt="">
         <div class="wall-body">
-          <span class="wall-name"><a href="#">Guest</a></span>
+          <span class="wall-name">Guest</span>
           <span class="wall-text"></span>
           <span class="wall-time">${when}</span>
         </div>`;
