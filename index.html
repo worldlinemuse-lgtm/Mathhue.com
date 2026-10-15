@@ -19,6 +19,8 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<a class="skip-link" href="#profile">Skip to profile</a>
+<div id="config-error" class="config-error" role="alert" hidden></div>
 
 <div class="fb-header">
   <div class="fb-header-inner">
@@ -45,7 +47,7 @@
       </div>
 
       <div class="actions">
-        <a href="#" id="poke-link">Poke MathHue</a>
+        <button type="button" id="poke-link" class="linklike">Poke MathHue</button>
         <a href="#wall">Send MathHue a Message</a>
         <a id="discord-btn" class="btn-primary btn-block" href="#discord-invite-placeholder">Join the Discord</a>
         <p id="poke-note" class="poke-note" hidden></p>

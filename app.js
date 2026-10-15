@@ -1,159 +1,258 @@
 /* Renders the classic-profile homage from site.config.json.
-   Wall posts + poke count persist in localStorage (this browser only). */
+   Wall posts + poke count persist in localStorage (this browser only),
+   with an in-memory fallback when storage is unavailable (private mode,
+   quota exceeded). All config-driven text is rendered via textContent —
+   no innerHTML on dynamic data — so malformed config can't inject markup. */
 (async function () {
-  let cfg;
-  try {
-    cfg = await (await fetch('site.config.json')).json();
-  } catch (e) {
-    console.error('Could not load site.config.json', e);
-    return;
+  'use strict';
+
+  // ---------- Safe storage ----------
+  const store = (() => {
+    const mem = {};
+    let ok = false;
+    try {
+      const k = '__mathhue_probe__';
+      localStorage.setItem(k, '1');
+      localStorage.removeItem(k);
+      ok = true;
+    } catch { ok = false; }
+    return {
+      get(k, fb) {
+        try {
+          const v = ok ? localStorage.getItem(k) : mem[k];
+          return v == null ? fb : v;
+        } catch {
+          return mem[k] != null ? mem[k] : fb;
+        }
+      },
+      set(k, v) {
+        try {
+          if (ok) localStorage.setItem(k, v);
+          else mem[k] = v;
+        } catch {
+          try { mem[k] = v; } catch { /* storage fully unavailable */ }
+        }
+      },
+    };
+  })();
+
+  // ---------- Visible failure instead of a hollow page ----------
+  function fail(msg) {
+    const bar = document.getElementById('config-error');
+    if (bar) {
+      bar.hidden = false;
+      bar.textContent = msg;
+    }
+    console.error('[MathHue]', msg);
   }
 
-  const name = cfg.siteName || 'MathHue';
-  document.title = `${name} | ${cfg.tagline || ''}`;
+  // ---------- Load + validate config ----------
+  let cfg;
+  try {
+    const res = await fetch('site.config.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    cfg = await res.json();
+  } catch (e) {
+    fail('Could not load the site configuration. Check your connection and refresh the page.');
+    return;
+  }
+  if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
+    fail('The site configuration is malformed and could not be displayed.');
+    return;
+  }
+  const str = v => (typeof v === 'string' ? v : '');
+  const arr = v => (Array.isArray(v) ? v : []);
+  const stripTags = s => str(s).replace(/<[^>]*>/g, '');
+
+  const name = str(cfg.siteName) || 'MathHue';
+  document.title = `${name} | ${str(cfg.tagline)}`;
 
   document.querySelectorAll('[data-config]').forEach(el => {
     const key = el.getAttribute('data-config');
-    if (cfg[key]) el.textContent = cfg[key];
+    if (typeof cfg[key] === 'string') el.textContent = cfg[key];
   });
 
-  // Portrait
-  const portrait = document.getElementById('portrait');
-  if (cfg.portrait) portrait.src = cfg.portrait;
-
-  // Status (third person, classic style)
-  document.getElementById('status-text').textContent = cfg.status || '';
-
-  // Placeholder links: dim + disable instead of dead-navigating.
+  // ---------- Placeholder links: dim + disable, never dead-navigate ----------
   // Dropping a real URL into site.config.json activates them automatically.
   function wireLink(el, url) {
-    el.href = url || '#';
-    if (!url || url.startsWith('#')) {
+    el.href = str(url) || '#';
+    if (!str(url) || str(url).startsWith('#')) {
       el.classList.add('placeholder');
       el.addEventListener('click', e => e.preventDefault());
     }
   }
 
+  // Portrait
+  const portrait = document.getElementById('portrait');
+  if (str(cfg.portrait)) portrait.src = cfg.portrait;
+
+  // Status (third person, classic style)
+  document.getElementById('status-text').textContent = str(cfg.status);
+
   // Discord + PayPal links
-  const discordUrl = (cfg.discord && cfg.discord.url) || '#';
-  const discordLabel = (cfg.discord && cfg.discord.label) || 'Join the Discord';
+  const discordUrl = str(cfg.discord && cfg.discord.url);
   const discordBtn = document.getElementById('discord-btn');
   wireLink(discordBtn, discordUrl);
-  discordBtn.textContent = discordLabel;
+  discordBtn.textContent = str(cfg.discord && cfg.discord.label) || 'Join the Discord';
   wireLink(document.getElementById('discord-link-2'), discordUrl);
-  const paypalUrl = (cfg.donate && cfg.donate.paypalUrl) || '#';
-  wireLink(document.getElementById('paypal-btn'), paypalUrl);
+  wireLink(document.getElementById('paypal-btn'), str(cfg.donate && cfg.donate.paypalUrl));
 
   // Information box
   const infoRows = document.getElementById('info-rows');
-  (cfg.info || []).forEach(row => {
+  arr(cfg.info).forEach(row => {
+    if (!row || typeof row !== 'object') return;
     const dt = document.createElement('dt');
-    dt.textContent = row.label;
+    dt.textContent = str(row.label);
     const dd = document.createElement('dd');
-    if (row.url && !row.url.startsWith('#')) {
+    if (str(row.url) && !str(row.url).startsWith('#')) {
       const a = document.createElement('a');
-      a.href = row.url;
-      a.textContent = row.value;
+      a.href = str(row.url);
+      a.textContent = str(row.value);
       dd.appendChild(a);
     } else {
-      dd.textContent = row.value;
+      dd.textContent = str(row.value);
     }
     infoRows.appendChild(dt, dd);
   });
 
   // Websites (social dock)
   const dock = document.getElementById('social-dock');
-  (cfg.socials || []).forEach(s => {
+  arr(cfg.socials).forEach(s => {
+    if (!s || typeof s !== 'object') return;
     const a = document.createElement('a');
-    a.href = s.url || '#';
-    a.title = s.name;
-    a.setAttribute('aria-label', s.name);
-    if (!s.url || s.url.startsWith('#')) {
-      a.classList.add('placeholder');
-      a.addEventListener('click', e => e.preventDefault());
-    }
-    a.innerHTML = (typeof SOCIAL_ICONS !== 'undefined' && SOCIAL_ICONS[s.icon]) || s.name;
+    wireLink(a, str(s.url));
+    a.title = str(s.name);
+    a.setAttribute('aria-label', str(s.name) || 'social link');
+    const icon = typeof SOCIAL_ICONS !== 'undefined' && SOCIAL_ICONS[s.icon];
+    if (icon) a.innerHTML = icon; // fixed trusted icon set only
+    else a.textContent = str(s.name);
     dock.appendChild(a);
   });
 
   // Community + photos placeholder grids
-  const thumb = () =>
-    `<div><img src="${portraitPlaceholderSVG()}" alt=""><div class="thumb-label">Member</div></div>`;
-  document.getElementById('community-grid').innerHTML = Array(6).fill(thumb()).join('');
-  document.getElementById('photos-strip').innerHTML =
-    Array(3).fill(`<div><img src="${portraitPlaceholderSVG()}" alt=""><div class="thumb-label">Album</div></div>`).join('');
+  const thumb = () => {
+    const wrap = document.createElement('div');
+    const img = document.createElement('img');
+    img.src = portraitPlaceholderSVG();
+    img.alt = '';
+    const label = document.createElement('div');
+    label.className = 'thumb-label';
+    label.textContent = 'Member';
+    wrap.append(img, label);
+    return wrap;
+  };
+  const community = document.getElementById('community-grid');
+  for (let i = 0; i < 6; i++) community.appendChild(thumb());
+  const photos = document.getElementById('photos-strip');
+  for (let i = 0; i < 3; i++) {
+    const t = thumb();
+    t.querySelector('.thumb-label').textContent = 'Album';
+    photos.appendChild(t);
+  }
 
   // Mini-Feed
   const feed = document.getElementById('mini-feed');
-  (cfg.miniFeed || []).forEach(item => {
+  arr(cfg.miniFeed).forEach(item => {
+    if (!item || typeof item !== 'object') return;
     const li = document.createElement('li');
-    li.innerHTML = `<span><strong>${name}</strong> ${item.text}</span><span class="time">${item.time || ''}</span>`;
+    const who = document.createElement('strong');
+    who.textContent = name;
+    const what = document.createElement('span');
+    what.append(who, document.createTextNode(' ' + stripTags(item.text)));
+    const time = document.createElement('span');
+    time.className = 'time';
+    time.textContent = str(item.time);
+    li.append(what, time);
     feed.appendChild(li);
   });
 
   // Boxes (feature tiles)
   const boxes = document.getElementById('boxes');
-  (cfg.tiles || []).filter(t => t.enabled).forEach(t => {
+  arr(cfg.tiles).filter(t => t && t.enabled).forEach(t => {
     const div = document.createElement('div');
     div.className = 'app-box';
-    div.id = 'box-' + t.id;
-    const feats = (t.features || []).map(f => `<li>${f}</li>`).join('');
-    div.innerHTML = `
-      <h3>${t.title}</h3>
-      <p>${t.blurb || ''}</p>
-      ${feats ? `<ul>${feats}</ul>` : ''}`;
+    div.id = 'box-' + stripTags(t.id);
+    const h3 = document.createElement('h3');
+    h3.textContent = str(t.title);
+    const p = document.createElement('p');
+    p.textContent = str(t.blurb);
+    div.append(h3, p);
+    if (arr(t.features).length) {
+      const ul = document.createElement('ul');
+      arr(t.features).forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = str(f);
+        ul.appendChild(li);
+      });
+      div.appendChild(ul);
+    }
     boxes.appendChild(div);
   });
 
-  // Poke (localStorage counter, classic style)
+  // Poke (storage-backed counter, classic style)
   const pokeKey = 'mathhue_pokes';
   const pokeNote = document.getElementById('poke-note');
   const renderPokes = () => {
-    const n = parseInt(localStorage.getItem(pokeKey) || '0', 10);
+    const n = parseInt(store.get(pokeKey, '0'), 10) || 0;
     if (n > 0) {
       pokeNote.hidden = false;
       pokeNote.textContent = `You have poked ${name} ${n} time${n === 1 ? '' : 's'}.`;
     }
   };
-  document.getElementById('poke-link').addEventListener('click', e => {
-    e.preventDefault();
-    localStorage.setItem(pokeKey, String((parseInt(localStorage.getItem(pokeKey) || '0', 10)) + 1));
+  document.getElementById('poke-link').addEventListener('click', () => {
+    const n = parseInt(store.get(pokeKey, '0'), 10) || 0;
+    store.set(pokeKey, String(n + 1));
     renderPokes();
   });
   renderPokes();
 
-  // The Wall (localStorage guestbook)
+  // The Wall (storage-backed guestbook)
   const wallKey = 'mathhue_wall';
   const wallPosts = document.getElementById('wall-posts');
   const wallEmpty = document.getElementById('wall-empty');
   const getPosts = () => {
-    try { return JSON.parse(localStorage.getItem(wallKey) || '[]'); } catch { return []; }
+    try {
+      const v = JSON.parse(store.get(wallKey, '[]'));
+      return Array.isArray(v) ? v : [];
+    } catch { return []; }
   };
   const renderWall = () => {
-    const posts = getPosts();
+    const posts = getPosts().filter(p => p && typeof p.text === 'string').slice(0, 50);
     wallEmpty.style.display = posts.length ? 'none' : '';
-    wallPosts.innerHTML = '';
+    wallPosts.textContent = '';
     posts.forEach(p => {
       const li = document.createElement('li');
-      const when = new Date(p.ts).toLocaleString();
-      li.innerHTML = `
-        <img class="wall-thumb" src="${portraitPlaceholderSVG()}" alt="">
-        <div class="wall-body">
-          <span class="wall-name">Guest</span>
-          <span class="wall-text"></span>
-          <span class="wall-time">${when}</span>
-        </div>`;
-      li.querySelector('.wall-text').textContent = p.text;
+      const img = document.createElement('img');
+      img.className = 'wall-thumb';
+      img.src = portraitPlaceholderSVG();
+      img.alt = '';
+      const body = document.createElement('div');
+      body.className = 'wall-body';
+      const who = document.createElement('span');
+      who.className = 'wall-name';
+      const whoLink = document.createElement('a');
+      whoLink.href = '#wall';
+      whoLink.textContent = 'Guest';
+      who.appendChild(whoLink);
+      const text = document.createElement('span');
+      text.className = 'wall-text';
+      text.textContent = p.text;
+      const when = document.createElement('span');
+      when.className = 'wall-time';
+      const ts = Number(p.ts);
+      when.textContent = Number.isFinite(ts) ? new Date(ts).toLocaleString() : '';
+      body.append(who, text, when);
+      li.append(img, body);
       wallPosts.appendChild(li);
     });
   };
   document.getElementById('wall-post').addEventListener('click', () => {
     const input = document.getElementById('wall-input');
-    const text = input.value.trim();
+    const text = input.value.trim().slice(0, 500);
     if (!text) return;
     const posts = getPosts();
     posts.unshift({ text, ts: Date.now() });
-    localStorage.setItem(wallKey, JSON.stringify(posts.slice(0, 50)));
+    store.set(wallKey, JSON.stringify(posts.slice(0, 50)));
     input.value = '';
     renderWall();
   });

@@ -23,6 +23,44 @@ body {
   font-size: 11px;
   line-height: 1.4;
 }
+/* Config-load failure banner: visible instead of a hollow page */
+.config-error {
+  max-width: 800px;
+  margin: 12px auto 0;
+  padding: 8px 12px;
+  background: #FFF9D7;
+  border: 1px solid var(--red);
+  color: var(--ink);
+  font-size: 12px;
+}
+/* Skip link: keyboard users only */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--fb-blue);
+  color: #fff;
+  padding: 6px 12px;
+  font-weight: bold;
+  z-index: 100;
+}
+.skip-link:focus { left: 0; }
+/* Button that looks like the classic action links */
+.linklike {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--fb-blue);
+  cursor: pointer;
+  text-align: left;
+}
+.linklike:hover { text-decoration: underline; }
+/* Visible keyboard focus everywhere */
+a:focus-visible, button:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--fb-blue);
+  outline-offset: 1px;
+}
 a { color: var(--fb-blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 h1, h2, h3 { margin: 0; }
@@ -70,8 +108,8 @@ h1, h2, h3 { margin: 0; }
   padding: 3px;
 }
 .photo-wrap img { width: 100%; display: block; }
-.actions { display: flex; flex-direction: column; gap: 3px; padding: 2px; }
-.actions a { font-size: 11px; }
+.actions { display: flex; flex-direction: column; gap: 3px; padding: 2px; align-items: flex-start; }
+.actions a, .actions .linklike { font-size: 11px; }
 .poke-note {
   margin: 4px 0 0;
   background: #FFF9D7;
