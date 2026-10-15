@@ -241,7 +241,7 @@
       when.className = 'wall-time';
       const ts = Number(p.ts);
       when.textContent = Number.isFinite(ts) ? new Date(ts).toLocaleString() : '';
-      body.append(who, text, when);
+      body.append(who, document.createTextNode(' '), text, when);
       li.append(img, body);
       wallPosts.appendChild(li);
     });
