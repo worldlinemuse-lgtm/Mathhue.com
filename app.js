@@ -24,15 +24,25 @@
   // Status (third person, classic style)
   document.getElementById('status-text').textContent = cfg.status || '';
 
+  // Placeholder links: dim + disable instead of dead-navigating.
+  // Dropping a real URL into site.config.json activates them automatically.
+  function wireLink(el, url) {
+    el.href = url || '#';
+    if (!url || url.startsWith('#')) {
+      el.classList.add('placeholder');
+      el.addEventListener('click', e => e.preventDefault());
+    }
+  }
+
   // Discord + PayPal links
   const discordUrl = (cfg.discord && cfg.discord.url) || '#';
   const discordLabel = (cfg.discord && cfg.discord.label) || 'Join the Discord';
   const discordBtn = document.getElementById('discord-btn');
-  discordBtn.href = discordUrl;
+  wireLink(discordBtn, discordUrl);
   discordBtn.textContent = discordLabel;
-  document.getElementById('discord-link-2').href = discordUrl;
+  wireLink(document.getElementById('discord-link-2'), discordUrl);
   const paypalUrl = (cfg.donate && cfg.donate.paypalUrl) || '#';
-  document.getElementById('paypal-btn').href = paypalUrl;
+  wireLink(document.getElementById('paypal-btn'), paypalUrl);
 
   // Information box
   const infoRows = document.getElementById('info-rows');
@@ -40,7 +50,7 @@
     const dt = document.createElement('dt');
     dt.textContent = row.label;
     const dd = document.createElement('dd');
-    if (row.url) {
+    if (row.url && !row.url.startsWith('#')) {
       const a = document.createElement('a');
       a.href = row.url;
       a.textContent = row.value;
@@ -58,7 +68,10 @@
     a.href = s.url || '#';
     a.title = s.name;
     a.setAttribute('aria-label', s.name);
-    if (s.url && s.url.startsWith('#')) a.classList.add('placeholder');
+    if (!s.url || s.url.startsWith('#')) {
+      a.classList.add('placeholder');
+      a.addEventListener('click', e => e.preventDefault());
+    }
     a.innerHTML = (typeof SOCIAL_ICONS !== 'undefined' && SOCIAL_ICONS[s.icon]) || s.name;
     dock.appendChild(a);
   });
@@ -88,8 +101,7 @@
     div.innerHTML = `
       <h3>${t.title}</h3>
       <p>${t.blurb || ''}</p>
-      ${feats ? `<ul>${feats}</ul>` : ''}
-      <a class="open-link" href="${t.link || '#'}">${t.cta || 'Open'} &raquo;</a>`;
+      ${feats ? `<ul>${feats}</ul>` : ''}`;
     boxes.appendChild(div);
   });
 
